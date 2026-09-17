@@ -7,6 +7,7 @@ AI-powered hackathon project.
 - Kartik
 - Anuj
 - Harshit
+- Anshul
 
 ## Project
 
