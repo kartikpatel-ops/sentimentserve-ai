@@ -1,9 +1,20 @@
-# Hackathon Project
+# SentimentServe AI
 
-This project is being developed for our hackathon.
+AI-powered hackathon project.
 
 ## Team
+
 - Kartik
 - Anuj
 - Harshit
-- Anshul
+
+## Project
+
+This project is being developed for our hackathon.
+
+## Technologies
+
+- Frontend
+- Backend
+- AI/ML
+- Database
