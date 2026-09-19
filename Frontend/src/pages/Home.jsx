@@ -36,15 +36,25 @@ function Home() {
           <span>Sentiment</span>Serve AI
         </div>
 
-        <div className="nav-links">
-          <a href="#businesses">Businesses</a>
-          <a href="#insights">AI Insights</a>
-          <a href="#about">About</a>
-        </div>
+       <div className="nav-links">
+  <a href="#businesses">Businesses</a>
 
-        <button className="login-btn">
-          Login
-        </button>
+  <button onClick={() => navigate("/ai-insights")}>
+    AI Insights
+  </button>
+
+  <button onClick={() => navigate("/dashboard")}>
+    Dashboard
+  </button>
+
+  <a href="#about">About</a>
+</div>
+       <button
+  className="login-btn"
+  onClick={() => navigate("/login")}
+>
+  Login
+</button>
 
       </nav>
 

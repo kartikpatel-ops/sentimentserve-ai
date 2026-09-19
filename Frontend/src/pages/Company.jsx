@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Brain,
   MessageSquare,
@@ -10,6 +10,7 @@ import "../App.css";
 
 function Company() {
   const { companyName } = useParams();
+  const navigate = useNavigate();
 
   const company = companies[companyName];
 
@@ -32,6 +33,14 @@ function Company() {
       <div className="company-hero">
         <div className="company-logo">
           {company.logo}
+          <button
+  className="write-review-btn"
+  onClick={() =>
+    navigate(`/company/${companyName}/review`)
+  }
+>
+  ✍ Write a Review
+</button>
         </div>
 
         <div>
