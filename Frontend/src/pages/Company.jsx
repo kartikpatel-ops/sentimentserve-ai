@@ -1,9 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Brain,
-  MessageSquare,
-  ThumbsUp,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Brain, MessageSquare, ThumbsUp } from "lucide-react";
 
 import companies from "../data/companies";
 import "../App.css";
@@ -14,42 +11,147 @@ function Company() {
 
   const company = companies[companyName];
 
-  // If company doesn't exist
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getReviews = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/reviews/${companyName}`
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setReviews(data.reviews || []);
+        } else {
+          console.error(data.message);
+        }
+      } catch (error) {
+        console.error("Error loading reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getReviews();
+  }, [companyName]);
+
+  // Company not found
   if (!company) {
     return (
       <div className="company-page">
         <h1>Company Not Found</h1>
+
         <p>
-          Sorry, we don't have information about "{companyName}" yet.
+          We don't have information about "{companyName}" yet.
         </p>
+
+        <button onClick={() => navigate("/")}>
+          Back to Home
+        </button>
       </div>
     );
   }
 
+  // -----------------------------
+  // SENTIMENT CALCULATION
+  // -----------------------------
+
+  const totalReviews = reviews.length;
+
+  const positive = reviews.filter(
+    (review) => review.sentiment === "positive"
+  ).length;
+
+  const neutral = reviews.filter(
+    (review) => review.sentiment === "neutral"
+  ).length;
+
+  const negative = reviews.filter(
+    (review) => review.sentiment === "negative"
+  ).length;
+
+  const positivePercent =
+    totalReviews > 0
+      ? Math.round((positive / totalReviews) * 100)
+      : 0;
+
+  const neutralPercent =
+    totalReviews > 0
+      ? Math.round((neutral / totalReviews) * 100)
+      : 0;
+
+  const negativePercent =
+    totalReviews > 0
+      ? Math.round((negative / totalReviews) * 100)
+      : 0;
+
+  // -----------------------------
+  // AVERAGE RATING
+  // -----------------------------
+
+  const averageRating =
+    totalReviews > 0
+      ? (
+          reviews.reduce(
+            (sum, review) => sum + Number(review.rating),
+            0
+          ) / totalReviews
+        ).toFixed(1)
+      : company.rating;
+
+  // -----------------------------
+  // TOPICS
+  // -----------------------------
+
+  const topicCounts = {};
+
+  reviews.forEach((review) => {
+    if (Array.isArray(review.topics)) {
+      review.topics.forEach((topic) => {
+        topicCounts[topic] =
+          (topicCounts[topic] || 0) + 1;
+      });
+    }
+  });
+
+  const topics = Object.entries(topicCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
   return (
     <div className="company-page">
 
-      {/* Company Header */}
+      {/* COMPANY HEADER */}
+
       <div className="company-hero">
+
         <div className="company-logo">
           {company.logo}
+
           <button
-  className="write-review-btn"
-  onClick={() =>
-    navigate(`/company/${companyName}/review`)
-  }
->
-  ✍ Write a Review
-</button>
+            className="write-review-btn"
+            onClick={() =>
+              navigate(
+                `/company/${companyName}/review`
+              )
+            }
+          >
+            ✍ Write a Review
+          </button>
         </div>
 
         <div>
           <h1>{company.name}</h1>
+
           <p>{company.category}</p>
 
           <div className="company-rating">
+
             <span className="big-rating">
-              {company.rating}
+              {averageRating}
             </span>
 
             <span className="stars">
@@ -57,22 +159,27 @@ function Company() {
             </span>
 
             <span>
-              {company.reviews} reviews
+              {totalReviews} reviews
             </span>
+
           </div>
         </div>
+
       </div>
 
 
-      {/* Rating + Sentiment */}
+      {/* RATING + SENTIMENT */}
+
       <div className="company-content">
 
-        {/* Rating */}
+        {/* RATING */}
+
         <section className="rating-summary">
+
           <h2>Customer Rating</h2>
 
           <div className="rating-number">
-            {company.rating}
+            {averageRating}
           </div>
 
           <div className="stars big-stars">
@@ -80,68 +187,75 @@ function Company() {
           </div>
 
           <p>
-            Based on {company.reviews} reviews
+            Based on {totalReviews} reviews
           </p>
+
         </section>
 
 
-        {/* AI Sentiment */}
+        {/* AI SENTIMENT */}
+
         <section className="sentiment-card">
 
           <div className="card-title">
+
             <Brain />
-            <h2>AI Sentiment Analysis</h2>
+
+            <h2>
+              AI Sentiment Analysis
+            </h2>
+
           </div>
 
 
           <div className="sentiment-stat">
             <span>Positive</span>
-            <strong>
-              {company.sentiment.positive}%
-            </strong>
+            <strong>{positivePercent}%</strong>
           </div>
 
           <div className="sentiment-bar">
+
             <div
               className="positive"
               style={{
-                width: `${company.sentiment.positive}%`,
+                width: `${positivePercent}%`,
               }}
-            ></div>
+            />
+
           </div>
 
 
           <div className="sentiment-stat">
             <span>Neutral</span>
-            <strong>
-              {company.sentiment.neutral}%
-            </strong>
+            <strong>{neutralPercent}%</strong>
           </div>
 
           <div className="sentiment-bar">
+
             <div
               className="neutral"
               style={{
-                width: `${company.sentiment.neutral}%`,
+                width: `${neutralPercent}%`,
               }}
-            ></div>
+            />
+
           </div>
 
 
           <div className="sentiment-stat">
             <span>Negative</span>
-            <strong>
-              {company.sentiment.negative}%
-            </strong>
+            <strong>{negativePercent}%</strong>
           </div>
 
           <div className="sentiment-bar">
+
             <div
               className="negative"
               style={{
-                width: `${company.sentiment.negative}%`,
+                width: `${negativePercent}%`,
               }}
-            ></div>
+            />
+
           </div>
 
         </section>
@@ -149,50 +263,79 @@ function Company() {
       </div>
 
 
-      {/* AI Insights */}
+      {/* AI TOPICS */}
+
       <section className="company-section">
 
         <div className="section-title">
+
           <Brain />
 
           <div>
-            <h2>What customers are saying</h2>
+            <h2>
+              AI-Detected Customer Topics
+            </h2>
+
             <p>
-              AI-generated insights from customer reviews.
+              Topics detected from customer reviews.
             </p>
           </div>
+
         </div>
 
 
         <div className="insight-grid">
 
-          {/* Customers Love */}
           <div className="insight positive-insight">
 
             <ThumbsUp />
 
             <div>
-              <h3>Customers love</h3>
 
-              <p>
-                {company.insights.love}
-              </p>
+              <h3>
+                Common Topics
+              </h3>
+
+              {topics.length > 0 ? (
+
+                <p>
+                  {topics
+                    .map(
+                      ([topic, count]) =>
+                        `${topic} (${count})`
+                    )
+                    .join(" • ")}
+                </p>
+
+              ) : (
+
+                <p>
+                  No topics detected yet.
+                </p>
+
+              )}
+
             </div>
 
           </div>
 
 
-          {/* Common Topics */}
           <div className="insight">
 
             <MessageSquare />
 
             <div>
-              <h3>Common topics</h3>
+
+              <h3>
+                AI Analysis
+              </h3>
 
               <p>
-                {company.insights.topics}
+                AI analyzes customer reviews
+                to identify sentiment and
+                frequently discussed topics.
               </p>
+
             </div>
 
           </div>
@@ -202,41 +345,113 @@ function Company() {
       </section>
 
 
-      {/* Reviews */}
+      {/* CUSTOMER REVIEWS */}
+
       <section className="company-section">
 
-        <h2>Customer Reviews</h2>
+        <h2>
+          Customer Reviews
+        </h2>
 
-        {company.reviewsList.map((review, index) => (
 
-          <div
-            className="review-card"
-            key={index}
-          >
+        {loading ? (
 
-            <div className="review-header">
+          <p>
+            Loading reviews...
+          </p>
 
-              <strong>
-                {review.name}
-              </strong>
+        ) : reviews.length > 0 ? (
 
-              <span className="stars">
-                {review.rating}
+          reviews.map((review) => (
+
+            <div
+              className="review-card"
+              key={review._id}
+            >
+
+              <div className="review-header">
+
+                <strong>
+                  {review.name}
+                </strong>
+
+                <span className="stars">
+
+                  {"★".repeat(
+                    Number(review.rating)
+                  )}
+
+                  {"☆".repeat(
+                    5 - Number(review.rating)
+                  )}
+
+                </span>
+
+              </div>
+
+
+              <p>
+                {review.text}
+              </p>
+
+
+              {/* AI RESULT */}
+
+              <p>
+                <strong>
+                  AI Sentiment:
+                </strong>{" "}
+                {review.sentiment}
+              </p>
+
+
+              {review.topics &&
+                review.topics.length > 0 && (
+
+                  <p>
+                    <strong>
+                      Topics:
+                    </strong>{" "}
+                    {review.topics.join(", ")}
+                  </p>
+
+                )}
+
+
+              {review.confidence > 0 && (
+
+                <p>
+                  <strong>
+                    AI Confidence:
+                  </strong>{" "}
+                  {review.confidence}%
+                </p>
+
+              )}
+
+
+              <span className="review-date">
+
+                {review.createdAt
+                  ? new Date(
+                      review.createdAt
+                    ).toLocaleDateString()
+                  : ""}
+
               </span>
 
             </div>
 
-            <p>
-              {review.text}
-            </p>
+          ))
 
-            <span className="review-date">
-              {review.date}
-            </span>
+        ) : (
 
-          </div>
+          <p>
+            No reviews yet. Be the first to
+            write one!
+          </p>
 
-        ))}
+        )}
 
       </section>
 
