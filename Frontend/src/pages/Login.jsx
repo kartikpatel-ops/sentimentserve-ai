@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  LogIn,
+} from "lucide-react";
 
 import "../App.css";
 
@@ -10,7 +14,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -18,7 +22,45 @@ function Login() {
       return;
     }
 
-    alert("Login UI is working. Backend authentication will be connected later.");
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Login failed.");
+        return;
+      }
+
+      // Store logged-in user information
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      alert("Login successful! ✅");
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.error("Login error:", error);
+
+      alert(
+        "Cannot connect to backend. Make sure the backend server is running."
+      );
+    }
   };
 
   return (
@@ -33,15 +75,18 @@ function Login() {
         <h1>Welcome Back</h1>
 
         <p className="auth-subtitle">
-          Login to continue to your account.
+          Login to your SentimentServe AI account.
         </p>
 
         <form onSubmit={handleSubmit}>
 
+          {/* Email */}
           <div className="auth-group">
+
             <label>Email</label>
 
             <div className="auth-input">
+
               <Mail size={18} />
 
               <input
@@ -49,14 +94,20 @@ function Login() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
+
             </div>
+
           </div>
 
+          {/* Password */}
           <div className="auth-group">
+
             <label>Password</label>
 
             <div className="auth-input">
+
               <Lock size={18} />
 
               <input
@@ -64,11 +115,18 @@ function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
+
             </div>
+
           </div>
 
-          <button className="auth-btn" type="submit">
+          {/* Login button */}
+          <button
+            className="auth-btn"
+            type="submit"
+          >
             <LogIn size={18} />
             Login
           </button>
@@ -80,7 +138,7 @@ function Login() {
           <button
             onClick={() => navigate("/signup")}
           >
-            Create Account
+            Sign Up
           </button>
         </p>
 

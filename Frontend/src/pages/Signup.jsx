@@ -16,15 +16,53 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check fields
     if (!name || !email || !password) {
       alert("Please fill in all fields.");
       return;
     }
 
-    alert("Signup UI is working. Backend registration will be connected later.");
+    try {
+      // Send signup data to backend
+      const response = await fetch(
+        "http://localhost:5000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      // Backend returned an error
+      if (!response.ok) {
+        alert(data.message || "Registration failed.");
+        return;
+      }
+
+      // Registration successful
+      alert("Account created successfully! ✅");
+
+      // Go to login page
+      navigate("/login");
+
+    } catch (error) {
+      console.error("Signup error:", error);
+
+      alert(
+        "Cannot connect to backend. Make sure the backend server is running."
+      );
+    }
   };
 
   return (
@@ -55,6 +93,7 @@ function Signup() {
                 placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -70,6 +109,7 @@ function Signup() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -85,6 +125,8 @@ function Signup() {
                 placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
+                required
               />
             </div>
           </div>
