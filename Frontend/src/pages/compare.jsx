@@ -32,7 +32,7 @@ function Compare() {
         const results = await Promise.all(
           companies.map(async (company) => {
             const response = await fetch(
-              `http://localhost:5000/api/reviews/${company.id}`
+              `https://sentimentserve-ai.onrender.com/api/reviews/${company.id}`
             );
 
             const data = response.ok

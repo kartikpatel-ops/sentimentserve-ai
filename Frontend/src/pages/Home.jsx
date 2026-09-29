@@ -63,7 +63,7 @@ function Home() {
       setRealBusinesses([]);
 
       const response = await fetch(
-        `http://localhost:5000/api/google-businesses?query=${encodeURIComponent(
+        `https://sentimentserve-ai.onrender.com/api/google-businesses?query=${encodeURIComponent(
           searchText
         )}`
       );
@@ -102,7 +102,7 @@ function Home() {
 
       if (selectedCategory === "All") {
         const response = await fetch(
-          "http://localhost:5000/api/google-businesses?query=businesses"
+          "https://sentimentserve-ai.onrender.com/api/google-businesses?query=businesses"
         );
 
         const data = await response.json();
@@ -139,7 +139,7 @@ function Home() {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/google-businesses?query=${encodeURIComponent(
+        `https://sentimentserve-ai.onrender.com/api/google-businesses?query=${encodeURIComponent(
           query
         )}`
       );
@@ -1419,7 +1419,7 @@ function BusinessCard({
 
           const response =
             await fetch(
-              `http://localhost:5000/api/business-image?query=${encodeURIComponent(
+              `https://sentimentserve-ai.onrender.com/api/business-image?query=${encodeURIComponent(
                 `${name} ${category}`
               )}`
             );

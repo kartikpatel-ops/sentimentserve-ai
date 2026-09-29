@@ -88,7 +88,7 @@ function Dashboard() {
     // =========================================================
 
     fetch(
-      `http://localhost:5000/api/reviews/${encodeURIComponent(
+      `https://sentimentserve-ai.onrender.com/api/reviews/${encodeURIComponent(
         company
       )}`
     )
@@ -290,7 +290,7 @@ function Dashboard() {
     // =========================================================
 
     fetch(
-      `http://localhost:5000/api/business-insights/${encodeURIComponent(
+      `https://sentimentserve-ai.onrender.com/api/business-insights/${encodeURIComponent(
         company
       )}`
     )

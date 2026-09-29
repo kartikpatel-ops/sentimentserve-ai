@@ -75,7 +75,7 @@ function AIInsights() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/ai/query",
+        "https://sentimentserve-ai.onrender.com/api/ai/query",
         {
           method: "POST",
 

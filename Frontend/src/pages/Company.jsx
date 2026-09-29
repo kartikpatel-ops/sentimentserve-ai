@@ -43,7 +43,7 @@ try {
   "business";
 
 const imageResponse = await fetch(
-  `http://localhost:5000/api/business-image?query=${encodeURIComponent(
+  `https://sentimentserve-ai.onrender.com/api/business-image?query=${encodeURIComponent(
     imageQuery
   )}`
 );
@@ -62,7 +62,7 @@ const imageResponse = await fetch(
   // Get SentimentServe reviews for this Google business
   try {
     const reviewResponse = await fetch(
-      `http://localhost:5000/api/reviews/${encodeURIComponent(
+      `https://sentimentserve-ai.onrender.com/api/reviews/${encodeURIComponent(
         googleBusiness.name
       )}`
     );
@@ -101,7 +101,7 @@ const imageResponse = await fetch(
         // ===============================
 
         const businessResponse = await fetch(
-          `http://localhost:5000/api/businesses/${companyName}`
+          `https://sentimentserve-ai.onrender.com/api/businesses/${companyName}`
         );
 
         if (businessResponse.ok) {
@@ -116,7 +116,7 @@ const imageResponse = await fetch(
         // ===============================
 
         const reviewResponse = await fetch(
-          `http://localhost:5000/api/reviews/${companyName}`
+          `https://sentimentserve-ai.onrender.com/api/reviews/${companyName}`
         );
 
         const reviewData = await reviewResponse.json();
@@ -134,7 +134,7 @@ const imageResponse = await fetch(
         // ===============================
 
         const healthResponse = await fetch(
-          `http://localhost:5000/api/business-health/${companyName}`
+          `https://sentimentserve-ai.onrender.com/api/business-health/${companyName}`
         );
 
         const healthData = await healthResponse.json();
@@ -151,7 +151,7 @@ const imageResponse = await fetch(
           setRedditLoading(true);
 
           const redditResponse = await fetch(
-            `http://localhost:5000/api/reddit/${encodeURIComponent(
+            `https://sentimentserve-ai.onrender.com/api/reddit/${encodeURIComponent(
               companyName
             )}`
           );

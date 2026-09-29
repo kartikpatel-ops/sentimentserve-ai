@@ -29,7 +29,7 @@ function Recommendations() {
   const loadReviews = async () => {
     try {
       const businessResponse = await fetch(
-        "http://localhost:5000/api/businesses"
+        "https://sentimentserve-ai.onrender.com/api/businesses"
       );
 
       const businessResult = await businessResponse.json();
@@ -45,7 +45,7 @@ function Recommendations() {
       const results = await Promise.all(
         businessList.map(async (business) => {
           const response = await fetch(
-            `http://localhost:5000/api/reviews/${business.slug}`
+            `https://sentimentserve-ai.onrender.com/api/reviews/${business.slug}`
           );
 
           if (!response.ok) {

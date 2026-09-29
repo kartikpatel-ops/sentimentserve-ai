@@ -1337,7 +1337,7 @@ const reviews = await Review.find({
 // -----------------------------------------
 
 const publicReviewsResponse = await fetch(
-  `http://localhost:5000/api/serpapi-reviews?business=${encodeURIComponent(
+  `https://sentimentserve-ai.onrender.com/api/serpapi-reviews?business=${encodeURIComponent(
     businessName
   )}`
 );
