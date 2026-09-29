@@ -10,19 +10,63 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter email and password.");
+  if (!email || !password) {
+    alert("Please enter email and password.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Login failed.");
       return;
     }
 
-    alert("Login UI is working. Backend authentication will be connected later.");
-  };
+    // Save login token
+    localStorage.setItem("token", data.token);
+
+    // Save user information
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
+    navigate("/");
+
+    alert("Login successful!");
+
+    navigate("/");
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Cannot connect to the server.");
+  }
+};
 
   return (
     <div className="auth-page">
+      <button
+  className="back-home-btn"
+  onClick={() => navigate("/")}
+>
+  ← Back to Home
+</button>
 
       <div className="auth-card">
 

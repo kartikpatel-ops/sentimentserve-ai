@@ -15,20 +15,57 @@ function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [company, setCompany] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!name || !email || !password) {
-      alert("Please fill in all fields.");
+ if (!name || !email || !password || !company) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+       body: JSON.stringify({
+  name,
+  email,
+  password,
+  company,
+})
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Signup failed.");
       return;
     }
 
-    alert("Signup UI is working. Backend registration will be connected later.");
-  };
+    alert("Account created successfully!");
+
+    navigate("/login");
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Cannot connect to the server.");
+  }
+};
 
   return (
     <div className="auth-page">
+      <button
+  className="back-home-btn"
+  onClick={() => navigate("/")}
+>
+  ← Back to Home
+</button>
 
       <div className="auth-card">
 
@@ -58,6 +95,20 @@ function Signup() {
               />
             </div>
           </div>
+          <div className="auth-group">
+  <label>Business Name</label>
+
+  <div className="auth-input">
+    <User size={18} />
+
+    <input
+      type="text"
+      placeholder="Enter your business name"
+      value={company}
+      onChange={(e) => setCompany(e.target.value)}
+    />
+  </div>
+</div>
 
           <div className="auth-group">
             <label>Email</label>

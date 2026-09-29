@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AIInsights from "./pages/AIInsights";
+import Compare from "./pages/compare";
+import Recommendations from "./pages/Recommendations";
 function App() {
   return (
     <BrowserRouter>
@@ -18,11 +20,16 @@ function App() {
           path="/company/:companyName"
           element={<Company />}
         />
+        <Route path="/company/google/:businessData" element={<Company />} />
 
         <Route
           path="/company/:companyName/review"
           element={<WriteReview />}
         />
+        <Route
+  path="/company/google/review"
+  element={<WriteReview />}
+/>
         <Route path="/login" element={<Login />} />
 
 <Route path="/signup" element={<Signup />} />
@@ -31,6 +38,11 @@ function App() {
   element={<Dashboard />}
 />
 <Route path="/ai-insights" element={<AIInsights />} />
+<Route path="/compare" element={<Compare />} />
+<Route
+  path="/recommendations"
+  element={<Recommendations />}
+/>
 
       </Routes>
     </BrowserRouter>
