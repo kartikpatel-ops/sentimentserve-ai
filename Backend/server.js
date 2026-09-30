@@ -15,7 +15,7 @@ const analyzeAuthenticity = require("./ai/authenticityAnalyzer");
 const calculateReviewerCredibility = require("./ai/reviewerCredibility");
 const generateBusinessInsights = require("./ai/businessInsightAnalyzer");
 const calculateBusinessHealthScore = require("./ai/businessHealthScore");
-
+const searchSocialMedia = require("./social/socialSearchService");
 
 
 const app = express();
@@ -1773,6 +1773,49 @@ const mapsResponse = await fetch(
     res.status(500).json({
       message: "Failed to fetch public reviews.",
       error: error.message,
+    });
+  }
+});
+// =========================================
+// SOCIAL MEDIA SEARCH
+// =========================================
+
+app.get("/api/social-media/:companyName", async (req, res) => {
+  try {
+    const companyName = decodeURIComponent(
+      req.params.companyName || ""
+    ).trim();
+
+    if (!companyName) {
+      return res.status(400).json({
+        message: "Business name is required."
+      });
+    }
+
+    console.log(
+      "SOCIAL MEDIA SEARCH:",
+      companyName
+    );
+
+    const socialData =
+      await searchSocialMedia(companyName);
+
+    res.json({
+      success: true,
+      ...socialData
+    });
+
+  } catch (error) {
+    console.error(
+      "Social media search error ❌:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Failed to search social media.",
+      error: error.message
     });
   }
 });

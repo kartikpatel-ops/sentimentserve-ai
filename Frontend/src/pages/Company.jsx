@@ -1,7 +1,12 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Brain, MessageSquare, ThumbsUp } from "lucide-react";
+import {
+  Brain,
+  MessageSquare,
+  ThumbsUp
+} from "lucide-react";
 
+import SocialMedia from "../components/SocialMedia";
 import companies from "../data/companies";
 import "../App.css";
 
@@ -898,6 +903,11 @@ const imageResponse = await fetch(
         </div>
 
       </section>
+      {/* ===============================
+          SOCIAL MEDIA
+      =============================== */}
+
+      <SocialMedia companyName={company.name} />
 
       {/* ===============================
           CUSTOMER REVIEWS
