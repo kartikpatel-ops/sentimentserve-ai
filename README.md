@@ -1,57 +1,143 @@
 # SentimentServe AI
 
-AI-powered sentiment analysis and personalized service recommendation platform developed for a hackathon.
+**AI-powered customer review and sentiment analysis platform built for a hackathon.**
 
-## 🚀 Overview
+SentimentServe AI helps users explore customer feedback, submit reviews, and understand sentiment and recurring topics using Natural Language Processing.
 
-**SentimentServe AI** analyzes user feedback using AI/ML techniques and provides sentiment insights along with personalized service recommendations.
+---
 
-The project aims to transform unstructured feedback into useful, actionable information through an automated workflow.
+## Overview
+
+Customer reviews contain valuable information about products and services, but manually reading large numbers of reviews can make it difficult to identify overall sentiment and recurring issues.
+
+SentimentServe AI processes customer reviews and extracts:
+
+* Sentiment
+* Confidence
+* Customer-feedback topics
+* Ratings
+* Review information
+
+The current NLP implementation uses the Node.js `natural` library with the **AFINN** sentiment lexicon.
+
+---
+
+## Features
+
+### Customer Reviews
+
+Users can:
+
+* Search for companies
+* View company information
+* Submit reviews
+* Select a rating from 1 to 5
+* Read submitted reviews
+
+### AI Sentiment Analysis
+
+Each submitted review is classified as:
+
+* Positive
+* Neutral
+* Negative
+
+### Topic Detection
+
+The current NLP system detects:
+
+* Delivery
+* Quality
+* Support
+* Pricing
+* Refund
+
+### Customer Intelligence
+
+The frontend includes:
+
+* Company sentiment summaries
+* Topic information
+* Dashboard views
+* AI Insights interface
+
+---
+
+## Technology Stack
+
+| Component       | Technology     |
+| --------------- | -------------- |
+| Frontend        | React 19       |
+| Build Tool      | Vite 8         |
+| Routing         | React Router   |
+| Icons           | Lucide React   |
+| Backend         | Node.js        |
+| API             | Express 5      |
+| Database        | MongoDB        |
+| ODM             | Mongoose 9     |
+| NLP             | Natural        |
+| Sentiment       | AFINN          |
+| Stemming        | Porter Stemmer |
+| Tokenization    | WordTokenizer  |
+| Environment     | dotenv         |
+| CORS            | cors           |
+| Linting         | Oxlint         |
+| Version Control | Git / GitHub   |
+
+---
+
+## Architecture
 
 ```text
-User Feedback
-      ↓
-Text Processing
-      ↓
-Sentiment Analysis
-      ↓
-Sentiment Result
-      ↓
-Recommendation
-      ↓
-Personalized Service
+User
+ |
+ v
+React Frontend
+ |
+ | HTTP / JSON
+ v
+Express Backend
+ |
+ +-------------------+
+ |                   |
+ v                   v
+NLP Analysis       MongoDB
+ |                   |
+ +---------+---------+
+           |
+           v
+     Review Result
+           |
+           v
+     React Frontend
 ```
 
-## 🎯 Problem Statement
+---
 
-Organizations receive large amounts of customer feedback through reviews, comments, surveys, and other channels.
-
-Manually analyzing this feedback can be time-consuming and difficult to scale.
-
-SentimentServe AI aims to simplify this process by automatically analyzing feedback and using the results to generate personalized recommendations.
-
-## ✨ Features
-
-* 📝 User feedback input
-* 🤖 AI-powered sentiment analysis
-* 🔤 Natural language processing
-* 📊 Sentiment classification
-* 🎯 Personalized service recommendations
-* 🔗 Frontend and backend integration
-* ✅ Input validation
-* ⚠️ Error handling
-* 🧩 Modular architecture
-
-## 🏗️ Project Structure
+## Project Structure
 
 ```text
 sentimentserve-ai/
 │
 ├── Backend/
-│   └── Backend source code
+│   ├── ai/
+│   │   └── sentimentAnalyzer.js
+│   ├── models/
+│   │   └── Review.js
+│   ├── package.json
+│   └── server.js
 │
 ├── Frontend/
-│   └── Frontend source code
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── data/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── index.css
+│   ├── package.json
+│   └── vite.config.js
 │
 ├── docs/
 │   ├── 01_Project_Overview.md
@@ -67,112 +153,258 @@ sentimentserve-ai/
 │   ├── 11_Future_Scope.md
 │   └── 12_Team_and_Contribution.md
 │
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
-## 🧠 How It Works
+---
 
-1. The user provides feedback.
-2. The feedback is sent for processing.
-3. The system performs text/sentiment analysis.
-4. The sentiment is identified.
-5. Recommendation logic processes the result.
-6. A personalized recommendation is presented to the user.
+## AI/NLP Pipeline
 
-## 🛠️ Technologies
+The current sentiment analysis process is:
 
-The project consists of the following major technology areas:
-
-* **Frontend** — User interface and interaction
-* **Backend** — Server-side processing and APIs
-* **AI/ML** — Sentiment analysis and intelligent processing
-* **Database** — Data storage and management
-
-> The exact frameworks, libraries, models, and database technologies are documented in the project documentation.
-
-## 📚 Documentation
-
-| Document                                                  | Description                         |
-| --------------------------------------------------------- | ----------------------------------- |
-| [Project Overview](docs/01_Project_Overview.md)           | Project introduction and objectives |
-| [Problem Statement](docs/02_Problem_Statement.md)         | Problem and proposed solution       |
-| [System Architecture](docs/03_System_Architecture.md)     | Overall system architecture         |
-| [Features](docs/04_Features.md)                           | Application features                |
-| [Technology Stack](docs/05_Technology_Stack.md)           | Technologies used                   |
-| [AI/ML Approach](docs/06_AI_ML_Approach.md)               | AI and NLP approach                 |
-| [API Documentation](docs/07_API_Documentation.md)         | API details                         |
-| [Database Design](docs/08_Database_Design.md)             | Database and data design            |
-| [Setup & Installation](docs/09_Setup_and_Installation.md) | Installation instructions           |
-| [Testing](docs/10_Testing.md)                             | Testing strategy and test cases     |
-| [Future Scope](docs/11_Future_Scope.md)                   | Future improvements                 |
-| [Team & Contribution](docs/12_Team_and_Contribution.md)   | Team responsibilities               |
-
-## ⚙️ Setup
-
-Clone the repository:
-
-```bash
-git clone [REPOSITORY_URL]
-cd sentimentserve-ai
+```text
+Review Text
+    ↓
+Lowercase
+    ↓
+Word Tokenization
+    ↓
+Porter Stemmer + AFINN
+    ↓
+Sentiment Score
+    ↓
+Positive / Neutral / Negative
+    ↓
+Confidence Calculation
+    ↓
+Keyword Topic Detection
+    ↓
+MongoDB
 ```
 
-For complete installation and configuration instructions:
+### Sentiment Thresholds
 
-**[Setup & Installation](docs/09_Setup_and_Installation.md)**
+```text
+score > 0.2  → positive
+score < -0.2 → negative
+otherwise    → neutral
+```
 
-## 🧪 Testing
+The generated confidence value is a project-specific heuristic and is not a calibrated probability.
 
-The project can be tested across:
+---
 
-* Frontend functionality
-* Backend functionality
-* API communication
-* Sentiment analysis
-* Recommendation generation
-* Input validation
-* Error handling
-* End-to-end workflow
+## API
+
+### Health Check
+
+```http
+GET /
+```
+
+### Submit Review
+
+```http
+POST /api/reviews
+```
+
+Example:
+
+```json
+{
+  "name": "Test User",
+  "company": "technova",
+  "rating": 5,
+  "text": "Great service and fast delivery."
+}
+```
+
+### Retrieve Company Reviews
+
+```http
+GET /api/reviews/:company
+```
+
+Example:
+
+```http
+GET /api/reviews/technova
+```
 
 See:
 
-**[Testing Documentation](docs/10_Testing.md)**
+`docs/07_API_Documentation.md`
 
-## 👥 Team
+for the complete API specification.
 
-* **Kartik**
-* **Anuj**
-* **Harshit**
-* **Anshul**
+---
 
-Detailed responsibilities and contributions:
+## Installation
 
-**[Team & Contribution](docs/12_Team_and_Contribution.md)**
+### Clone
 
-## 🔮 Future Scope
+```bash
+git clone https://github.com/kartikpatel-ops/sentimentserve-ai.git
+cd sentimentserve-ai
+```
 
-Potential future improvements include:
+### Backend
 
-* Advanced sentiment analysis
+```bash
+cd Backend
+npm install
+```
+
+Create:
+
+```text
+Backend/.env
+```
+
+with:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+```
+
+Start the backend:
+
+```bash
+node server.js
+```
+
+Optional development mode:
+
+```bash
+npx nodemon server.js
+```
+
+### Frontend
+
+Open another terminal:
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+---
+
+## Frontend Commands
+
+Development:
+
+```bash
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+---
+
+## Important Current Limitations
+
+The current implementation is a hackathon prototype.
+
+### Authentication
+
+Login and Signup pages are currently UI-only.
+
+Backend authentication has not yet been implemented.
+
+### AI Recommendations
+
+The backend currently performs:
+
+* Sentiment analysis
+* Confidence calculation
+* Topic detection
+
+There is no separate backend recommendation engine.
+
+The dashboard contains predefined recommendation and insight content.
+
+### AI Model
+
+The current sentiment system is lexicon-based using AFINN. It is not a custom-trained machine-learning model.
+
+### Automated Testing
+
+The repository currently does not contain a dedicated automated backend test suite.
+
+---
+
+## Future Scope
+
+Possible future improvements include:
+
+* Secure authentication
+* User accounts
+* Advanced sentiment models
+* Multilingual NLP
 * Aspect-based sentiment analysis
-* Multilingual support
-* Real-time analytics
-* Social-media integration
+* Dynamic AI recommendations
+* Sentiment trends
+* Advanced business analytics
+* Social-media integrations
 * Explainable AI
-* Improved recommendation models
-* Mobile application
-* Advanced reporting
+* Notifications
+* Cloud deployment
+* Automated testing
 
-See the complete roadmap:
+---
 
-**[Future Scope](docs/11_Future_Scope.md)**
+## Team
 
-## 📌 Project Status
+* Kartik
+* Anuj
+* Harshit
+* Anshul
 
-**Hackathon Project — In Development**
+---
 
-This project is being developed as part of a hackathon.
+## Documentation
 
-## 📄 License
+| Document                       | Description                         |
+| ------------------------------ | ----------------------------------- |
+| `01_Project_Overview.md`       | Project introduction and objectives |
+| `02_Problem_Statement.md`      | Problem and proposed solution       |
+| `03_System_Architecture.md`    | System architecture and data flow   |
+| `04_Features.md`               | Application features                |
+| `05_Technology_Stack.md`       | Technologies used                   |
+| `06_AI_ML_Approach.md`         | NLP and sentiment methodology       |
+| `07_API_Documentation.md`      | Backend API                         |
+| `08_Database_Design.md`        | MongoDB and Mongoose design         |
+| `09_Setup_and_Installation.md` | Installation and setup              |
+| `10_Testing.md`                | Testing strategy                    |
+| `11_Future_Scope.md`           | Future improvements                 |
+| `12_Team_and_Contribution.md`  | Team and contribution information   |
 
-License information can be added here once the project's licensing decision has been finalized.
+---
 
+## Project Status
+
+**Hackathon Prototype**
+
+The current version demonstrates an end-to-end customer review workflow with NLP-based sentiment analysis, topic detection, MongoDB persistence, and a React frontend.
+
+---
+
+## License
+
+This project was created as a hackathon project.
+
+Add an explicit open-source license if the project is intended to be distributed under one.
