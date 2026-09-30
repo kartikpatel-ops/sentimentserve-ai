@@ -24,31 +24,17 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// ===============================
-// MONGODB ATLAS CONNECTION
-// ===============================
-
-async function connectMongoDB() {
-  try {
-    if (!process.env.MONGO_URI) {
-      throw new Error("MONGO_URI is missing");
-    }
-
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 10000,
-    });
-
-    console.log("MongoDB Atlas connected successfully ✅");
-    console.log("Database:", mongoose.connection.name);
-  } catch (error) {
-    console.error("MongoDB Atlas connection failed ❌");
+// MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected successfully ✅");
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed ❌");
     console.error(error.message);
+  });
 
-    process.exit(1);
-  }
-}
-
-connectMongoDB();
 // Test
 app.get("/", (req, res) => {
   res.json({
@@ -1351,7 +1337,7 @@ const reviews = await Review.find({
 // -----------------------------------------
 
 const publicReviewsResponse = await fetch(
-  `https://sentimentserve-ai.onrender.com/api/serpapi-reviews?business=${encodeURIComponent(
+  `http://localhost:5000/api/serpapi-reviews?business=${encodeURIComponent(
     businessName
   )}`
 );
