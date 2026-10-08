@@ -296,7 +296,7 @@ setRecommendations(scoredBusinesses);
               <option value="delivery">
                 Delivery
               </option>
-
+  
               <option value="quality">
                 Product Quality
               </option>

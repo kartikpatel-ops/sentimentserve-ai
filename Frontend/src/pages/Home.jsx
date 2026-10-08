@@ -11,222 +11,968 @@ import {
 
 import "../App.css";
 
+/*
+=========================================================
+API CONFIGURATION
+=========================================================
+*/
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://sentimentserve-ai.onrender.com";
+
+
+/*
+=========================================================
+HOME
+=========================================================
+*/
+
 function Home() {
+
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [realBusinesses, setRealBusinesses] = useState([]);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [profileOpen, setProfileOpen] = useState(false);
+
+  const [category, setCategory] =
+    useState("All");
+
+  const [preference, setPreference] =
+    useState("All");
+
+  const [realBusinesses, setRealBusinesses] =
+    useState([]);
+
+  const [searchLoading, setSearchLoading] =
+    useState(false);
+
+  const [user, setUser] =
+    useState(null);
+
+  const [profileOpen, setProfileOpen] =
+    useState(false);
 
   const navigate = useNavigate();
 
-  // =========================
-  // LOAD LOGGED-IN USER
-  // =========================
+
+  /*
+  ========================================================
+  LOAD LOGGED-IN USER
+  ========================================================
+  */
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+
+    const savedUser =
+      localStorage.getItem("user");
 
     if (savedUser) {
+
       try {
-        const loggedInUser = JSON.parse(savedUser);
+
+        const loggedInUser =
+          JSON.parse(savedUser);
+
         setUser(loggedInUser);
+
       } catch (error) {
-        console.error("Failed to load user:", error);
-      }
-    }
-  }, []);
 
-  // =========================
-  // LOAD BUSINESSES ON HOME PAGE
-  // =========================
-
-  useEffect(() => {
-    handleCategoryChange("All");
-  }, []);
-
-  // =========================
-  // GOOGLE BUSINESS SEARCH
-  // =========================
-
-  const handleSearch = async () => {
-    const searchText = search.trim();
-
-    if (searchText === "") {
-      alert("Please enter a business or location.");
-      return;
-    }
-
-    try {
-      setSearchLoading(true);
-      setRealBusinesses([]);
-
-      const response = await fetch(
-        `https://sentimentserve-ai.onrender.com/api/google-businesses?query=${encodeURIComponent(
-          searchText
-        )}`
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Google business search failed."
+        console.error(
+          "Failed to load user:",
+          error
         );
+
       }
 
-      setRealBusinesses(data.businesses || []);
-    } catch (error) {
-      console.error("Google business search error:", error);
-      alert("Unable to search Google businesses.");
-    } finally {
-      setSearchLoading(false);
     }
+
+  }, []);
+
+
+  /*
+  ========================================================
+  PREFERENCE OPTIONS
+  ========================================================
+  */
+
+  const preferenceOptions = {
+
+    All: [
+      {
+        value: "All",
+        label: "All Preferences",
+      },
+    ],
+
+
+    /*
+    ======================================================
+    RESTAURANTS
+    ======================================================
+    */
+
+    Restaurants: [
+
+      {
+        value: "All",
+        label: "All Restaurants",
+      },
+
+      {
+        value: "Vegetarian",
+        label: "🥗 Vegetarian",
+      },
+
+      {
+        value: "Non-Vegetarian",
+        label: "🍗 Non-Vegetarian",
+      },
+
+      {
+        value: "Vegan",
+        label: "🌱 Vegan",
+      },
+
+      {
+        value: "Jain",
+        label: "🥗 Jain",
+      },
+
+      {
+        value: "Budget",
+        label: "💰 Budget",
+      },
+
+      {
+        value: "Premium",
+        label: "💎 Premium",
+      },
+
+      {
+        value: "Family",
+        label: "👨‍👩‍👧 Family Friendly",
+      },
+
+      {
+        value: "FastFood",
+        label: "🍔 Fast Food",
+      },
+
+      {
+        value: "FineDining",
+        label: "🍽️ Fine Dining",
+      },
+
+      {
+        value: "Outdoor",
+        label: "🌳 Outdoor Seating",
+      },
+
+    ],
+
+
+    /*
+    ======================================================
+    CAFES
+    ======================================================
+    */
+
+    Cafes: [
+
+      {
+        value: "All",
+        label: "All Cafes",
+      },
+
+      {
+        value: "Vegetarian",
+        label: "🥗 Vegetarian",
+      },
+
+      {
+        value: "Vegan",
+        label: "🌱 Vegan",
+      },
+
+      {
+        value: "Budget",
+        label: "💰 Budget",
+      },
+
+      {
+        value: "Premium",
+        label: "💎 Premium",
+      },
+
+      {
+        value: "Work",
+        label: "💻 Work Friendly",
+      },
+
+      {
+        value: "Outdoor",
+        label: "🌳 Outdoor Seating",
+      },
+
+      {
+        value: "Desserts",
+        label: "🍰 Desserts",
+      },
+
+      {
+        value: "Coffee",
+        label: "☕ Coffee",
+      },
+
+      {
+        value: "Family",
+        label: "👨‍👩‍👧 Family Friendly",
+      },
+
+    ],
+
+
+    /*
+    ======================================================
+    HOTELS
+    ======================================================
+    */
+
+    Hotels: [
+
+      {
+        value: "All",
+        label: "All Hotels",
+      },
+
+      {
+        value: "Budget",
+        label: "💰 Budget",
+      },
+
+      {
+        value: "Luxury",
+        label: "✨ Luxury",
+      },
+
+      {
+        value: "Family",
+        label: "👨‍👩‍👧 Family",
+      },
+
+      {
+        value: "Business",
+        label: "💼 Business",
+      },
+
+      {
+        value: "Couple",
+        label: "❤️ Couple Friendly",
+      },
+
+      {
+        value: "PetFriendly",
+        label: "🐕 Pet Friendly",
+      },
+
+      {
+        value: "Pool",
+        label: "🏊 Swimming Pool",
+      },
+
+      {
+        value: "Parking",
+        label: "🚗 Parking",
+      },
+
+      {
+        value: "Breakfast",
+        label: "🍳 Breakfast",
+      },
+
+      {
+        value: "Airport",
+        label: "✈️ Near Airport",
+      },
+
+    ],
+
+
+    /*
+    ======================================================
+    OTHER CATEGORIES
+    ======================================================
+    */
+
+    Shopping: [
+
+      {
+        value: "All",
+        label: "All Shopping",
+      },
+
+      {
+        value: "Budget",
+        label: "💰 Budget",
+      },
+
+      {
+        value: "Premium",
+        label: "💎 Premium",
+      },
+
+    ],
+
+
+    Travel: [
+
+      {
+        value: "All",
+        label: "All Travel",
+      },
+
+      {
+        value: "Family",
+        label: "👨‍👩‍👧 Family",
+      },
+
+      {
+        value: "Adventure",
+        label: "🏔️ Adventure",
+      },
+
+      {
+        value: "Honeymoon",
+        label: "❤️ Honeymoon",
+      },
+
+    ],
+
+
+    Technology: [
+
+      {
+        value: "All",
+        label: "All Technology",
+      },
+
+      {
+        value: "Software",
+        label: "💻 Software",
+      },
+
+      {
+        value: "Hardware",
+        label: "🖥️ Hardware",
+      },
+
+    ],
+
+
+    Transportation: [
+
+      {
+        value: "All",
+        label: "All Transportation",
+      },
+
+      {
+        value: "Bus",
+        label: "🚌 Bus",
+      },
+
+      {
+        value: "Taxi",
+        label: "🚕 Taxi",
+      },
+
+      {
+        value: "Train",
+        label: "🚆 Train",
+      },
+
+    ],
+
+
+    Banking: [
+
+      {
+        value: "All",
+        label: "All Banks",
+      },
+
+      {
+        value: "Government",
+        label: "🏛️ Government Bank",
+      },
+
+      {
+        value: "Private",
+        label: "🏦 Private Bank",
+      },
+
+    ],
+
   };
 
-  // =========================
-  // CATEGORY SEARCH
-  // =========================
 
-  const handleCategoryChange = async (selectedCategory) => {
+  /*
+  ========================================================
+  PREFERENCE → GOOGLE SEARCH QUERY
+  ========================================================
+  */
+
+  const preferenceQueries = {
+
+    /*
+    RESTAURANTS
+    */
+
+    Restaurants: {
+
+      All:
+        "restaurants",
+
+      Vegetarian:
+        "vegetarian restaurants",
+
+      "Non-Vegetarian":
+        "non vegetarian restaurants",
+
+      Vegan:
+        "vegan restaurants",
+
+      Jain:
+        "Jain restaurants",
+
+      Budget:
+        "budget restaurants",
+
+      Premium:
+        "premium restaurants",
+
+      Family:
+        "family friendly restaurants",
+
+      FastFood:
+        "fast food restaurants",
+
+      FineDining:
+        "fine dining restaurants",
+
+      Outdoor:
+        "restaurants with outdoor seating",
+
+    },
+
+
+    /*
+    CAFES
+    */
+
+    Cafes: {
+
+      All:
+        "cafes",
+
+      Vegetarian:
+        "vegetarian cafes",
+
+      Vegan:
+        "vegan cafes",
+
+      Budget:
+        "budget cafes",
+
+      Premium:
+        "premium cafes",
+
+      Work:
+        "work friendly cafes",
+
+      Outdoor:
+        "cafes with outdoor seating",
+
+      Desserts:
+        "dessert cafes",
+
+      Coffee:
+        "coffee shops",
+
+      Family:
+        "family friendly cafes",
+
+    },
+
+
+    /*
+    HOTELS
+    */
+
+    Hotels: {
+
+      All:
+        "hotels",
+
+      Budget:
+        "budget hotels",
+
+      Luxury:
+        "luxury hotels",
+
+      Family:
+        "family hotels",
+
+      Business:
+        "business hotels",
+
+      Couple:
+        "couple friendly hotels",
+
+      PetFriendly:
+        "pet friendly hotels",
+
+      Pool:
+        "hotels with swimming pool",
+
+      Parking:
+        "hotels with parking",
+
+      Breakfast:
+        "hotels with breakfast",
+
+      Airport:
+        "hotels near airport",
+
+    },
+
+
+    /*
+    OTHER CATEGORIES
+    */
+
+    Shopping: {
+
+      All:
+        "shopping malls",
+
+      Budget:
+        "budget shopping malls",
+
+      Premium:
+        "premium shopping malls",
+
+    },
+
+
+    Travel: {
+
+      All:
+        "travel agencies",
+
+      Family:
+        "family travel agencies",
+
+      Adventure:
+        "adventure travel agencies",
+
+      Honeymoon:
+        "honeymoon travel agencies",
+
+    },
+
+
+    Technology: {
+
+      All:
+        "technology companies",
+
+      Software:
+        "software companies",
+
+      Hardware:
+        "hardware companies",
+
+    },
+
+
+    Transportation: {
+
+      All:
+        "transportation services",
+
+      Bus:
+        "bus services",
+
+      Taxi:
+        "taxi services",
+
+      Train:
+        "train services",
+
+    },
+
+
+    Banking: {
+
+      All:
+        "banks",
+
+      Government:
+        "government banks",
+
+      Private:
+        "private banks",
+
+    },
+
+  };
+
+
+  /*
+  ========================================================
+  CATEGORY + PREFERENCE SEARCH
+  ========================================================
+  */
+
+  const handleCategoryChange = async (
+    selectedCategory,
+    selectedPreference = "All"
+  ) => {
+
     setCategory(selectedCategory);
 
+    setPreference(selectedPreference);
+
     try {
+
       setSearchLoading(true);
+
       setRealBusinesses([]);
 
-      // =========================
-      // ALL CATEGORIES
-      // =========================
 
-      if (selectedCategory === "All") {
-        const response = await fetch(
-          "https://sentimentserve-ai.onrender.com/api/google-businesses?query=businesses"
-        );
+      /*
+      Find query based on category
+      and preference.
+      */
 
-        const data = await response.json();
+      let query = "businesses";
 
-        if (!response.ok) {
-          throw new Error(
-            data.message || "Failed to load businesses."
-          );
-        }
 
-        setRealBusinesses(data.businesses || []);
-        return;
+      if (
+        preferenceQueries[selectedCategory] &&
+        preferenceQueries[selectedCategory][
+          selectedPreference
+        ]
+      ) {
+
+        query =
+          preferenceQueries[
+            selectedCategory
+          ][selectedPreference];
+
+      } else {
+
+        const categoryQueries = {
+
+          All:
+            "businesses",
+
+          Restaurants:
+            "restaurants",
+
+          Cafes:
+            "cafes",
+
+          Shopping:
+            "shopping malls",
+
+          Travel:
+            "travel agencies",
+
+          Technology:
+            "technology companies",
+
+          Hotels:
+            "hotels",
+
+          Transportation:
+            "transportation services",
+
+          Banking:
+            "banks",
+
+        };
+
+        query =
+          categoryQueries[
+            selectedCategory
+          ] || "businesses";
+
       }
 
-      // =========================
-      // GOOGLE CATEGORY QUERIES
-      // =========================
 
-      const categoryQueries = {
-        Food: "restaurants",
-        Shopping: "shopping malls",
-        Travel: "travel agencies",
-        Technology: "technology companies",
-        Hotels: "hotels",
-        Transportation: "transportation services",
-        Banking: "banks",
-      };
-
-      const query = categoryQueries[selectedCategory];
-
-      if (!query) {
-        setRealBusinesses([]);
-        return;
-      }
-
-      const response = await fetch(
-        `https://sentimentserve-ai.onrender.com/api/google-businesses?query=${encodeURIComponent(
-          query
-        )}`
+      console.log(
+        "Google Places search:",
+        query
       );
 
-      const data = await response.json();
+
+      /*
+      ====================================================
+      CALL RENDER BACKEND
+      ====================================================
+      */
+
+      const response =
+        await fetch(
+          `${API_URL}/api/google-businesses?query=${encodeURIComponent(
+            query
+          )}`
+        );
+
+
+      const data =
+        await response.json();
+
 
       if (!response.ok) {
+
         throw new Error(
-          data.message || "Category search failed."
+          data.message ||
+          "Business search failed."
         );
+
       }
 
-      setRealBusinesses(data.businesses || []);
+
+      setRealBusinesses(
+        data.businesses || []
+      );
+
+
     } catch (error) {
+
       console.error(
-        "Category business search error:",
+        "Preference business search error:",
         error
       );
 
-      alert("Unable to load businesses for this category.");
+
+      alert(
+        error.message ||
+        "Unable to load businesses for this preference."
+      );
+
+
     } finally {
+
       setSearchLoading(false);
+
     }
+
   };
 
-  // =========================
-  // BUSINESS STATISTICS
-  // =========================
 
-  const businessesWithRatings = realBusinesses
-    .map((business) => Number(business.rating))
-    .filter(
-      (rating) =>
-        !Number.isNaN(rating) &&
-        rating > 0
+  /*
+  ========================================================
+  LOAD BUSINESSES WHEN HOME OPENS
+  ========================================================
+  */
+
+  useEffect(() => {
+
+    handleCategoryChange(
+      "All",
+      "All"
     );
+
+  }, []);
+
+
+  /*
+  ========================================================
+  GOOGLE BUSINESS SEARCH
+  ========================================================
+  */
+
+  const handleSearch = async () => {
+
+    const searchText =
+      search.trim();
+
+
+    if (searchText === "") {
+
+      alert(
+        "Please enter a business or location."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      setSearchLoading(true);
+
+      setRealBusinesses([]);
+
+
+      const response =
+        await fetch(
+          `${API_URL}/api/google-businesses?query=${encodeURIComponent(
+            searchText
+          )}`
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message ||
+          "Google business search failed."
+        );
+
+      }
+
+
+      setRealBusinesses(
+        data.businesses || []
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Google business search error:",
+        error
+      );
+
+
+      alert(
+        error.message ||
+        "Unable to search Google businesses."
+      );
+
+
+    } finally {
+
+      setSearchLoading(false);
+
+    }
+
+  };
+
+
+  /*
+  ========================================================
+  BUSINESS STATISTICS
+  ========================================================
+  */
+
+  const businessesWithRatings =
+    realBusinesses
+
+      .map((business) =>
+        Number(business.rating)
+      )
+
+      .filter(
+        (rating) =>
+          !Number.isNaN(rating) &&
+          rating > 0
+      );
+
 
   const averageRating =
     businessesWithRatings.length > 0
+
       ? (
           businessesWithRatings.reduce(
-            (sum, rating) => sum + rating,
+            (sum, rating) =>
+              sum + rating,
             0
-          ) / businessesWithRatings.length
+          ) /
+          businessesWithRatings.length
         ).toFixed(1)
+
       : "—";
 
-  const totalReviews = realBusinesses.reduce(
-    (total, business) =>
-      total +
-      Number(
-        business.reviewCount ||
+
+  const totalReviews =
+    realBusinesses.reduce(
+      (total, business) =>
+        total +
+        Number(
+          business.reviewCount ||
           business.total_ratings ||
           0
-      ),
-    0
-  );
+        ),
+      0
+    );
 
-  // =========================
-  // LOGOUT
-  // =========================
+
+  /*
+  ========================================================
+  LOGOUT
+  ========================================================
+  */
 
   const handleLogout = () => {
+
     localStorage.removeItem("user");
+
+    localStorage.removeItem("token");
+
     setUser(null);
+
     setProfileOpen(false);
+
     navigate("/");
+
   };
 
+
+  /*
+  ========================================================
+  RETURN
+  ========================================================
+  */
+
   return (
+
     <div className="app">
 
-      {/* =====================================================
+
+      {/* =================================================
           NAVBAR
-      ===================================================== */}
+      ================================================= */}
 
       <nav className="navbar">
 
+
         <div className="logo">
-          <span>Sentiment</span>Serve AI
+
+          <span>
+            Sentiment
+          </span>
+
+          Serve AI
+
         </div>
 
+
         <div className="nav-links">
+
 
           <a href="#businesses">
             Businesses
           </a>
+
 
           <button
             onClick={() =>
@@ -236,6 +982,7 @@ function Home() {
             AI Insights
           </button>
 
+
           <button
             onClick={() =>
               navigate("/recommendations")
@@ -243,6 +990,7 @@ function Home() {
           >
             Recommendations
           </button>
+
 
           <button
             onClick={() =>
@@ -252,126 +1000,189 @@ function Home() {
             Dashboard
           </button>
 
+
           <a href="#about">
             About
           </a>
 
+
         </div>
 
-        {/* =====================================================
+
+        {/* =================================================
             PROFILE / LOGIN
-        ===================================================== */}
+        ================================================= */}
 
         {user ? (
 
           <div className="nav-auth-buttons">
 
+
             <div className="profile-menu">
+
 
               <button
                 className="profile-button"
-                onClick={() => {
-                  setProfileOpen(!profileOpen);
-                }}
-                aria-expanded={profileOpen}
+                onClick={() =>
+                  setProfileOpen(
+                    !profileOpen
+                  )
+                }
+                aria-expanded={
+                  profileOpen
+                }
               >
+
 
                 <span className="profile-avatar">
                   👤
                 </span>
 
+
                 <span className="profile-name">
-                  {user.name || "User"}
+
+                  {user.name ||
+                    "User"}
+
                 </span>
+
 
                 <span className="profile-arrow">
-                  {profileOpen ? "▲" : "▼"}
+
+                  {profileOpen
+                    ? "▲"
+                    : "▼"}
+
                 </span>
 
+
               </button>
+
 
               {profileOpen && (
 
                 <div className="profile-dropdown">
 
+
                   <div className="profile-dropdown-header">
+
 
                     <div className="profile-large-avatar">
                       👤
                     </div>
 
+
                     <div>
 
                       <strong>
-                        {user.name || "User"}
+
+                        {user.name ||
+                          "User"}
+
                       </strong>
 
+
                       {user.email && (
+
                         <span>
                           {user.email}
                         </span>
+
                       )}
 
                     </div>
 
+
                   </div>
+
 
                   <div className="profile-details">
 
+
                     {user.company && (
+
                       <div className="profile-detail">
-                        <span>Company</span>
+
+                        <span>
+                          Company
+                        </span>
 
                         <strong>
                           {user.company}
                         </strong>
+
                       </div>
+
                     )}
 
+
                     {user.role && (
+
                       <div className="profile-detail">
-                        <span>Role</span>
+
+                        <span>
+                          Role
+                        </span>
 
                         <strong>
                           {user.role}
                         </strong>
+
                       </div>
+
                     )}
 
+
                     {user.username && (
+
                       <div className="profile-detail">
-                        <span>Username</span>
+
+                        <span>
+                          Username
+                        </span>
 
                         <strong>
                           {user.username}
                         </strong>
+
                       </div>
+
                     )}
+
 
                   </div>
 
+
                   <div className="profile-dropdown-footer">
+
 
                     <button
                       className="profile-logout"
-                      onClick={handleLogout}
+                      onClick={
+                        handleLogout
+                      }
                     >
                       Logout
                     </button>
 
+
                   </div>
+
 
                 </div>
 
               )}
 
+
             </div>
+
 
           </div>
 
         ) : (
 
           <div className="nav-auth-buttons">
+
 
             <button
               className="login-btn"
@@ -382,6 +1193,7 @@ function Home() {
               Login
             </button>
 
+
             <button
               className="signup-btn"
               onClick={() =>
@@ -391,41 +1203,60 @@ function Home() {
               Sign Up
             </button>
 
+
           </div>
 
         )}
 
+
       </nav>
 
 
-      {/* =====================================================
-          HERO SECTION
-      ===================================================== */}
+      {/* =================================================
+          HERO
+      ================================================= */}
 
       <section className="hero">
 
+
         <div className="hero-content">
 
+
           <div className="ai-badge">
+
             <Brain size={18} />
+
             AI-Powered Insights
+
           </div>
 
+
           <h1>
+
             Find Real Opinions.
+
             <br />
+
             Make Better Choices.
+
           </h1>
 
+
           <p>
-            Discover trusted reviews, understand customer
-            sentiment, and get smarter AI-powered insights
-            before you decide.
+
+            Discover trusted reviews,
+            understand customer sentiment,
+            and get smarter AI-powered
+            insights before you decide.
+
           </p>
+
 
           <div className="search-box">
 
+
             <Search size={22} />
+
 
             <input
               type="text"
@@ -435,41 +1266,60 @@ function Home() {
                 setSearch(e.target.value)
               }
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+
+                if (
+                  e.key === "Enter"
+                ) {
+
                   handleSearch();
+
                 }
+
               }}
             />
 
-            <button onClick={handleSearch}>
+
+            <button
+              onClick={
+                handleSearch
+              }
+            >
               Search
             </button>
 
+
           </div>
+
 
           <div className="trusted-text">
 
             <ShieldCheck size={16} />
 
-            Trusted reviews • AI-powered analysis • Real insights
+            Trusted reviews •
+            AI-powered analysis •
+            Real insights
 
           </div>
 
+
         </div>
+
 
       </section>
 
 
-      {/* =====================================================
+      {/* =================================================
           POPULAR BUSINESSES
-      ===================================================== */}
+      ================================================= */}
 
       <section
         className="business-section"
         id="businesses"
       >
 
+
         <div className="section-heading">
+
 
           <div>
 
@@ -478,80 +1328,211 @@ function Home() {
             </h2>
 
             <p>
-              See what customers are saying right now.
+              See what customers are
+              saying right now.
             </p>
 
           </div>
 
-          <div className="category-dropdown">
 
-            <label htmlFor="category">
-              Category:
-            </label>
+          {/* =================================================
+              FILTERS
+          ================================================= */}
 
-            <select
-              id="category"
-              value={category}
-              onChange={(e) =>
-                handleCategoryChange(
-                  e.target.value
-                )
-              }
-            >
+          <div className="filters-container">
 
-              <option value="All">
-                All Categories
-              </option>
 
-              <option value="Food">
-                Food
-              </option>
+            {/* CATEGORY */}
 
-              <option value="Shopping">
-                Shopping
-              </option>
+            <div className="category-dropdown">
 
-              <option value="Travel">
-                Travel
-              </option>
 
-              <option value="Technology">
-                Technology
-              </option>
+              <label htmlFor="category">
+                Category:
+              </label>
 
-              <option value="Hotels">
-                Hotels
-              </option>
 
-              <option value="Transportation">
-                Transportation
-              </option>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => {
 
-              <option value="Banking">
-                Banking
-              </option>
+                  const newCategory =
+                    e.target.value;
 
-            </select>
+
+                  setCategory(
+                    newCategory
+                  );
+
+
+                  setPreference(
+                    "All"
+                  );
+
+
+                  handleCategoryChange(
+                    newCategory,
+                    "All"
+                  );
+
+                }}
+              >
+
+
+                <option value="All">
+                  All Categories
+                </option>
+
+
+                <option value="Restaurants">
+                  🍽️ Restaurants
+                </option>
+
+
+                <option value="Cafes">
+                  ☕ Cafes
+                </option>
+
+
+                <option value="Hotels">
+                  🏨 Hotels
+                </option>
+
+
+                <option value="Shopping">
+                  🛍️ Shopping
+                </option>
+
+
+                <option value="Travel">
+                  ✈️ Travel
+                </option>
+
+
+                <option value="Technology">
+                  💻 Technology
+                </option>
+
+
+                <option value="Transportation">
+                  🚌 Transportation
+                </option>
+
+
+                <option value="Banking">
+                  🏦 Banking
+                </option>
+
+
+              </select>
+
+
+            </div>
+
+
+            {/* =================================================
+                PREFERENCE
+            ================================================= */}
+
+            <div className="category-dropdown">
+
+
+              <label htmlFor="preference">
+                Preference:
+              </label>
+
+
+              <select
+                id="preference"
+                value={preference}
+                onChange={(e) => {
+
+                  const newPreference =
+                    e.target.value;
+
+
+                  handleCategoryChange(
+                    category,
+                    newPreference
+                  );
+
+                }}
+              >
+
+
+                {(
+                  preferenceOptions[
+                    category
+                  ] ||
+                  preferenceOptions.All
+                ).map(
+                  (option) => (
+
+                    <option
+                      key={
+                        option.value
+                      }
+                      value={
+                        option.value
+                      }
+                    >
+
+                      {option.label}
+
+                    </option>
+
+                  )
+                )}
+
+
+              </select>
+
+
+            </div>
+
 
           </div>
+
+
+          {/* =================================================
+              REFRESH
+          ================================================= */}
 
           <button
             className="view-btn"
             onClick={() => {
-              setCategory("All");
+
+              setCategory(
+                "All"
+              );
+
+              setPreference(
+                "All"
+              );
+
               setSearch("");
-              handleCategoryChange("All");
+
+              handleCategoryChange(
+                "All",
+                "All"
+              );
+
             }}
           >
             Refresh Businesses
           </button>
 
+
         </div>
 
 
-        {/* BUSINESS GRID */}
+        {/* =================================================
+            BUSINESS GRID
+        ================================================= */}
 
         <div className="business-grid">
+
 
           {searchLoading ? (
 
@@ -565,29 +1546,37 @@ function Home() {
               (business) => (
 
                 <BusinessCard
+
                   key={
                     business.placeId ||
                     business.id ||
                     business.name
                   }
 
-                  name={business.name}
+
+                  name={
+                    business.name
+                  }
+
 
                   category={
                     business.category ||
                     "Google Business"
                   }
 
+
                   rating={
                     business.rating ||
                     "New"
                   }
+
 
                   reviews={
                     business.reviewCount ||
                     business.total_ratings ||
                     0
                   }
+
 
                   onClick={() => {
 
@@ -601,6 +1590,7 @@ function Home() {
                     );
 
                   }}
+
                 />
 
               )
@@ -609,27 +1599,38 @@ function Home() {
           ) : (
 
             <p>
-              No Google businesses found yet.
-              Search for a business above.
+
+              No Google businesses
+              found yet.
+
+              <br />
+
+              Search for a business
+              or select a category.
+
             </p>
 
           )}
 
+
         </div>
+
 
       </section>
 
 
-      {/* =====================================================
+      {/* =================================================
           AI INSIGHTS SECTION
-      ===================================================== */}
+      ================================================= */}
 
       <section
         className="insights"
         id="insights"
       >
 
+
         <div className="insights-text">
+
 
           <div className="badge">
 
@@ -639,20 +1640,32 @@ function Home() {
 
           </div>
 
+
           <h2>
+
             Reviews tell the story.
-            <span> AI explains it.</span>
+
+            <span>
+              {" "}AI explains it.
+            </span>
+
           </h2>
 
+
           <p>
-            Instead of simply showing star ratings,
-            SentimentServe AI analyzes customer reviews
-            to discover what people love, what frustrates
-            them, and what businesses can improve.
+
+            Instead of simply showing
+            star ratings, SentimentServe AI
+            analyzes customer reviews to
+            discover what people love, what
+            frustrates them, and what
+            businesses can improve.
+
           </p>
 
 
           <div className="features">
+
 
             <Feature
               icon={<Brain />}
@@ -660,11 +1673,13 @@ function Home() {
               text="Automatically detect positive, neutral, and negative opinions."
             />
 
+
             <Feature
               icon={<TrendingUp />}
               title="Customer Trends"
               text="Discover changing customer opinions and important trends."
             />
+
 
             <Feature
               icon={<Star />}
@@ -672,16 +1687,19 @@ function Home() {
               text="Combine ratings and AI insights to understand businesses better."
             />
 
+
           </div>
+
 
         </div>
 
 
-        {/* =====================================================
+        {/* =================================================
             REAL BUSINESS INSIGHTS
-        ===================================================== */}
+        ================================================= */}
 
         <div className="ai-card">
+
 
           <div className="ai-header">
 
@@ -696,9 +1714,13 @@ function Home() {
 
             <>
 
+
               <p className="ai-description">
-                Real information from the businesses
-                currently returned by Google Places.
+
+                Real information from the
+                businesses currently returned
+                by Google Places.
+
               </p>
 
 
@@ -721,7 +1743,8 @@ function Home() {
 
                 <div
                   style={{
-                    width: "100%",
+                    width:
+                      "100%",
                   }}
                 />
 
@@ -740,7 +1763,8 @@ function Home() {
 
                   {averageRating}
 
-                  {averageRating !== "—"
+                  {averageRating !==
+                  "—"
                     ? " ★"
                     : ""}
 
@@ -754,11 +1778,13 @@ function Home() {
                 <div
                   style={{
                     width:
-                      averageRating !== "—"
+                      averageRating !==
+                      "—"
                         ? `${Math.min(
                             Number(
                               averageRating
-                            ) * 20,
+                            ) *
+                              20,
                             100
                           )}%`
                         : "0%",
@@ -777,7 +1803,9 @@ function Home() {
                 </span>
 
                 <strong>
+
                   {totalReviews.toLocaleString()}
+
                 </strong>
 
               </div>
@@ -788,7 +1816,8 @@ function Home() {
                 <div
                   style={{
                     width:
-                      totalReviews > 0
+                      totalReviews >
+                      0
                         ? "100%"
                         : "0%",
                   }}
@@ -804,13 +1833,18 @@ function Home() {
                 <Brain size={18} />
 
                 <span>
-                  Select a business to open its
-                  detailed AI analysis. Sentiment
-                  percentages are calculated only
-                  when actual review data is available.
+
+                  Select a business
+                  to open its detailed
+                  AI analysis. Sentiment
+                  percentages are calculated
+                  only when actual review
+                  data is available.
+
                 </span>
 
               </div>
+
 
             </>
 
@@ -818,9 +1852,13 @@ function Home() {
 
             <>
 
+
               <p className="ai-description">
-                Search for a business or select a
-                category to see live business insights.
+
+                Search for a business or
+                select a category to see
+                live business insights.
+
               </p>
 
 
@@ -829,74 +1867,107 @@ function Home() {
                 <Search size={18} />
 
                 <span>
-                  Google ratings, review counts,
-                  and business information will
-                  appear here when results are available.
+
+                  Google ratings, review
+                  counts, and business
+                  information will appear
+                  here when results are
+                  available.
+
                 </span>
 
               </div>
+
 
             </>
 
           )}
 
+
         </div>
+
 
       </section>
 
 
-      {/* =====================================================
-          ABOUT SENTIMENTSERVE AI
-      ===================================================== */}
+      {/* =================================================
+          ABOUT
+      ================================================= */}
 
       <section
         id="about"
         className="about-section"
       >
 
+
         <div className="about-container">
 
-          {/* =================================================
-              ABOUT PROJECT
-          ================================================= */}
+
+          {/* ABOUT PROJECT */}
 
           <div className="about-content">
 
+
             <span className="about-badge">
+
               About SentimentServe AI
+
             </span>
 
+
             <h2>
+
               Understand Customer Opinions.
-              <span> Make Smarter Decisions.</span>
+
+              <span>
+                {" "}Make Smarter Decisions.
+              </span>
+
             </h2>
 
+
             <p className="about-intro">
-              SentimentServe AI is an AI-powered business
-              review and customer insights platform designed
-              to help users discover genuine opinions and
-              help businesses understand their customers better.
+
+              SentimentServe AI is an
+              AI-powered business review
+              and customer insights platform
+              designed to help users discover
+              genuine opinions and help
+              businesses understand their
+              customers better.
+
             </p>
 
-            <p>
-              The platform analyzes customer reviews and
-              feedback using Artificial Intelligence to identify
-              sentiment, important topics, customer satisfaction
-              and common concerns.
-            </p>
 
             <p>
-              Instead of simply displaying reviews,
-              SentimentServe AI transforms customer feedback
-              into meaningful insights that can help businesses
-              improve their services and help users make more
-              informed decisions.
+
+              The platform analyzes customer
+              reviews and feedback using
+              Artificial Intelligence to identify
+              sentiment, important topics,
+              customer satisfaction and common
+              concerns.
+
+            </p>
+
+
+            <p>
+
+              Instead of simply displaying
+              reviews, SentimentServe AI
+              transforms customer feedback
+              into meaningful insights that can
+              help businesses improve their
+              services and help users make
+              more informed decisions.
+
             </p>
 
 
             {/* PROJECT FEATURES */}
 
             <div className="about-features">
+
 
               <div className="about-feature">
 
@@ -911,8 +1982,12 @@ function Home() {
                   </h4>
 
                   <p>
-                    Understand whether customer feedback
-                    is positive, neutral or negative.
+
+                    Understand whether
+                    customer feedback is
+                    positive, neutral or
+                    negative.
+
                   </p>
 
                 </div>
@@ -933,8 +2008,11 @@ function Home() {
                   </h4>
 
                   <p>
-                    Convert customer reviews into useful
-                    business insights and trends.
+
+                    Convert customer reviews
+                    into useful business insights
+                    and trends.
+
                   </p>
 
                 </div>
@@ -955,8 +2033,10 @@ function Home() {
                   </h4>
 
                   <p>
-                    Share experiences, ratings and opinions
-                    about businesses.
+
+                    Share experiences, ratings
+                    and opinions about businesses.
+
                   </p>
 
                 </div>
@@ -977,30 +2057,36 @@ function Home() {
                   </h4>
 
                   <p>
-                    Search businesses and explore customer
-                    experiences in one place.
+
+                    Search businesses and
+                    explore customer experiences
+                    in one place.
+
                   </p>
 
                 </div>
 
               </div>
 
+
             </div>
+
 
           </div>
 
 
-          {/* =================================================
-              CONTACT CARD
-          ================================================= */}
+          {/* CONTACT CARD */}
 
           <div className="about-contact-card">
 
+
             <div className="contact-card-header">
+
 
               <div className="contact-main-icon">
                 💬
               </div>
+
 
               <div>
 
@@ -1009,11 +2095,15 @@ function Home() {
                 </h3>
 
                 <p>
-                  Have questions, suggestions or feedback?
-                  Contact the SentimentServe AI team.
+
+                  Have questions, suggestions
+                  or feedback? Contact the
+                  SentimentServe AI team.
+
                 </p>
 
               </div>
+
 
             </div>
 
@@ -1022,9 +2112,11 @@ function Home() {
 
             <div className="contact-detail">
 
+
               <div className="contact-detail-icon">
                 📞
               </div>
+
 
               <div>
 
@@ -1032,11 +2124,15 @@ function Home() {
                   Contact Number
                 </span>
 
+
                 <a href="tel:+918817874033">
+
                   +91 8817874033
+
                 </a>
 
               </div>
+
 
             </div>
 
@@ -1045,9 +2141,11 @@ function Home() {
 
             <div className="contact-detail">
 
+
               <div className="contact-detail-icon">
                 ✉️
               </div>
+
 
               <div>
 
@@ -1055,11 +2153,15 @@ function Home() {
                   Email
                 </span>
 
+
                 <a href="mailto:kartikpatel@181007@gmail.com">
+
                   kartikpatel@181007@gmail.com
+
                 </a>
 
               </div>
+
 
             </div>
 
@@ -1068,9 +2170,11 @@ function Home() {
 
             <div className="contact-detail">
 
+
               <div className="contact-detail-icon">
                 🌐
               </div>
+
 
               <div>
 
@@ -1078,11 +2182,13 @@ function Home() {
                   Platform
                 </span>
 
+
                 <strong>
                   SentimentServe AI
                 </strong>
 
               </div>
+
 
             </div>
 
@@ -1091,9 +2197,11 @@ function Home() {
 
             <div className="contact-detail">
 
+
               <div className="contact-detail-icon">
                 🚀
               </div>
+
 
               <div>
 
@@ -1101,11 +2209,13 @@ function Home() {
                   Project
                 </span>
 
+
                 <strong>
                   AI-Powered Customer Insights
                 </strong>
 
               </div>
+
 
             </div>
 
@@ -1113,6 +2223,7 @@ function Home() {
             {/* SOCIAL LINKS */}
 
             <div className="contact-social">
+
 
               <a
                 href="https://github.com/"
@@ -1122,6 +2233,7 @@ function Home() {
                 GitHub
               </a>
 
+
               <a
                 href="https://www.linkedin.com/"
                 target="_blank"
@@ -1130,23 +2242,28 @@ function Home() {
                 LinkedIn
               </a>
 
+
             </div>
 
 
             <div className="contact-footer">
-              Built with ❤️ by the SentimentServe AI Team
+
+              Built with ❤️ by the
+              SentimentServe AI Team
+
             </div>
 
+
           </div>
+
 
         </div>
 
 
-        {/* =================================================
-            PROJECT HIGHLIGHTS
-        ================================================= */}
+        {/* PROJECT HIGHLIGHTS */}
 
         <div className="project-info">
+
 
           <div className="project-info-item">
 
@@ -1199,24 +2316,38 @@ function Home() {
 
           </div>
 
+
         </div>
+
 
       </section>
 
 
-      {/* =====================================================
+      {/* =================================================
           FOOTER
-      ===================================================== */}
+      ================================================= */}
 
       <footer>
 
+
         <div className="logo">
-          <span>Sentiment</span>Serve AI
+
+          <span>
+            Sentiment
+          </span>
+
+          Serve AI
+
         </div>
 
+
         <p>
-          AI-powered customer intelligence platform.
+
+          AI-powered customer intelligence
+          platform.
+
         </p>
+
 
         <div className="footer-contact">
 
@@ -1230,31 +2361,48 @@ function Home() {
 
         </div>
 
+
         <p className="copyright">
-          © 2026 SentimentServe AI. Built for Hackathon.
+
+          © 2026 SentimentServe AI.
+          Built for Hackathon.
+
         </p>
+
 
       </footer>
 
+
     </div>
+
   );
+
 }
 
 
-// =====================================================
-// BUSINESS EMOJI
-// =====================================================
+/*
+=========================================================
+BUSINESS EMOJI
+=========================================================
+*/
 
-function getBusinessEmoji(name, category) {
+function getBusinessEmoji(
+  name,
+  category
+) {
 
   const businessName =
-    name.toLowerCase();
+    String(name || "")
+      .toLowerCase();
 
   const businessCategory =
-    category.toLowerCase();
+    String(category || "")
+      .toLowerCase();
 
 
-  // Shopping
+  /*
+  SHOPPING
+  */
 
   if (
     businessName.includes("mall") ||
@@ -1262,11 +2410,15 @@ function getBusinessEmoji(name, category) {
     businessName.includes("mart") ||
     businessName.includes("shopping")
   ) {
+
     return "🛍️";
+
   }
 
 
-  // Restaurants
+  /*
+  RESTAURANTS
+  */
 
   if (
     businessName.includes("restaurant") ||
@@ -1276,22 +2428,30 @@ function getBusinessEmoji(name, category) {
     businessName.includes("dhaba") ||
     businessName.includes("kitchen")
   ) {
+
     return "🍽️";
+
   }
 
 
-  // Hotels
+  /*
+  HOTELS
+  */
 
   if (
     businessName.includes("hotel") ||
     businessName.includes("resort") ||
     businessName.includes("inn")
   ) {
+
     return "🏨";
+
   }
 
 
-  // Banks
+  /*
+  BANKS
+  */
 
   if (
     businessName.includes("bank") ||
@@ -1300,22 +2460,30 @@ function getBusinessEmoji(name, category) {
     businessName.includes("sbi") ||
     businessName.includes("axis")
   ) {
+
     return "🏦";
+
   }
 
 
-  // Hospitals
+  /*
+  HOSPITALS
+  */
 
   if (
     businessName.includes("hospital") ||
     businessName.includes("clinic") ||
     businessName.includes("health")
   ) {
+
     return "🏥";
+
   }
 
 
-  // Cinema
+  /*
+  CINEMA
+  */
 
   if (
     businessName.includes("inox") ||
@@ -1324,58 +2492,96 @@ function getBusinessEmoji(name, category) {
     businessName.includes("theatre") ||
     businessName.includes("theater")
   ) {
+
     return "🎬";
+
   }
 
 
-  // Travel
+  /*
+  TRAVEL
+  */
 
   if (
     businessName.includes("travel") ||
     businessName.includes("tour") ||
     businessName.includes("trip")
   ) {
+
     return "✈️";
+
   }
 
 
-  // Category fallback
+  /*
+  CATEGORY FALLBACK
+  */
 
   if (
     businessCategory.includes("food") ||
     businessCategory.includes("restaurant")
   ) {
+
     return "🍽️";
+
   }
+
+
+  if (
+    businessCategory.includes("cafe")
+  ) {
+
+    return "☕";
+
+  }
+
 
   if (
     businessCategory.includes("shopping")
   ) {
+
     return "🛍️";
+
   }
+
 
   if (
     businessCategory.includes("hotel")
   ) {
+
     return "🏨";
+
   }
+
 
   if (
     businessCategory.includes("bank")
   ) {
+
     return "🏦";
+
   }
 
 
   return "🏢";
+
 }
 
 
-// =====================================================
-// BUSINESS CARD
-// =====================================================
+/*
+=========================================================
+BUSINESS IMAGE CACHE
+=========================================================
+*/
 
 const imageCache = {};
+
+
+/*
+=========================================================
+BUSINESS CARD
+=========================================================
+*/
 
 function BusinessCard({
   name,
@@ -1385,8 +2591,10 @@ function BusinessCard({
   onClick,
 }) {
 
+
   const [imageUrl, setImageUrl] =
     useState("");
+
 
   const [photographer, setPhotographer] =
     useState("");
@@ -1394,14 +2602,18 @@ function BusinessCard({
 
   useEffect(() => {
 
+
     const loadBusinessImage =
       async () => {
+
 
         const cacheKey =
           `${name}-${category}`;
 
 
-        // Check cache
+        /*
+        CHECK CACHE
+        */
 
         if (
           imageCache[cacheKey]
@@ -1412,14 +2624,16 @@ function BusinessCard({
           );
 
           return;
+
         }
 
 
         try {
 
+
           const response =
             await fetch(
-              `https://sentimentserve-ai.onrender.com/api/business-image?query=${encodeURIComponent(
+              `${API_URL}/api/business-image?query=${encodeURIComponent(
                 `${name} ${category}`
               )}`
             );
@@ -1434,12 +2648,15 @@ function BusinessCard({
             data.imageUrl
           ) {
 
+
             setImageUrl(
               data.imageUrl
             );
 
+
             setPhotographer(
-              data.photographer || ""
+              data.photographer ||
+              ""
             );
 
 
@@ -1448,14 +2665,18 @@ function BusinessCard({
             ] =
               data.imageUrl;
 
+
           }
 
+
         } catch (error) {
+
 
           console.error(
             "Business image loading error:",
             error
           );
+
 
         }
 
@@ -1464,21 +2685,28 @@ function BusinessCard({
 
     loadBusinessImage();
 
+
   }, [name, category]);
 
 
-  // =========================
-  // REAL STAR DISPLAY
-  // =========================
+  /*
+  ========================================================
+  REAL STAR DISPLAY
+  ========================================================
+  */
 
   const numericRating =
     Number(rating) || 0;
 
+
   const roundedRating =
-    Math.round(numericRating);
+    Math.round(
+      numericRating
+    );
 
 
   return (
+
 
     <div
       className="business-card"
@@ -1488,18 +2716,23 @@ function BusinessCard({
       }}
     >
 
+
       {/* IMAGE */}
 
       <div className="company-image">
 
+
         {imageUrl ? (
+
 
           <img
             src={imageUrl}
             alt={name}
           />
 
+
         ) : (
+
 
           <div className="image-placeholder">
 
@@ -1512,6 +2745,7 @@ function BusinessCard({
 
         )}
 
+
       </div>
 
 
@@ -1519,9 +2753,11 @@ function BusinessCard({
 
       <div className="company-info">
 
+
         <h3>
           {name}
         </h3>
+
 
         <p>
           {category}
@@ -1532,17 +2768,21 @@ function BusinessCard({
 
         <div className="rating">
 
+
           <div className="stars">
+
 
             {"★★★★★"
               .split("")
               .map(
                 (_, index) =>
-                  index < roundedRating
+                  index <
+                  roundedRating
                     ? "★"
                     : "☆"
               )
               .join("")}
+
 
           </div>
 
@@ -1553,11 +2793,16 @@ function BusinessCard({
 
 
           <span>
+
             {Number(
               reviews || 0
-            ).toLocaleString()}{" "}
+            ).toLocaleString()}
+
+            {" "}
             reviews
+
           </span>
+
 
         </div>
 
@@ -1567,22 +2812,30 @@ function BusinessCard({
         {photographer && (
 
           <small>
-            Photo by {photographer} / Pexels
+
+            Photo by {photographer}
+            {" "} / Pexels
+
           </small>
 
         )}
 
+
       </div>
+
 
     </div>
 
   );
+
 }
 
 
-// =====================================================
-// FEATURE
-// =====================================================
+/*
+=========================================================
+FEATURE
+=========================================================
+*/
 
 function Feature({
   icon,
@@ -1590,29 +2843,40 @@ function Feature({
   text,
 }) {
 
+
   return (
+
 
     <div className="feature">
 
+
       <div className="feature-icon">
+
         {icon}
+
       </div>
 
+
       <div>
+
 
         <h3>
           {title}
         </h3>
 
+
         <p>
           {text}
         </p>
 
+
       </div>
+
 
     </div>
 
   );
+
 }
 
 

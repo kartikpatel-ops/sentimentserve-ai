@@ -1780,45 +1780,40 @@ const mapsResponse = await fetch(
 // SOCIAL MEDIA SEARCH
 // =========================================
 
-app.get("/api/social-media/:companyName", async (req, res) => {
-  try {
-    const companyName = decodeURIComponent(
-      req.params.companyName || ""
-    ).trim();
+app.get(
+  "/api/social-media/:companyName",
+  async (req, res) => {
+    try {
+      const companyName = req.params.companyName;
 
-    if (!companyName) {
-      return res.status(400).json({
-        message: "Business name is required."
+      if (!companyName) {
+        return res.status(400).json({
+          error: "Company name is required",
+        });
+      }
+
+      console.log(
+        `Social media search: ${companyName}`
+      );
+
+      const data =
+        await searchSocialMedia(companyName);
+
+      return res.json(data);
+
+    } catch (error) {
+      console.error(
+        "Social media search error:",
+        error
+      );
+
+      return res.status(500).json({
+        error: "Social media API failed",
+        message: error.message,
       });
     }
-
-    console.log(
-      "SOCIAL MEDIA SEARCH:",
-      companyName
-    );
-
-    const socialData =
-      await searchSocialMedia(companyName);
-
-    res.json({
-      success: true,
-      ...socialData
-    });
-
-  } catch (error) {
-    console.error(
-      "Social media search error ❌:",
-      error
-    );
-
-    res.status(500).json({
-      success: false,
-      message:
-        "Failed to search social media.",
-      error: error.message
-    });
   }
-});
+);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
